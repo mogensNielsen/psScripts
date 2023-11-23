@@ -9,5 +9,14 @@ function fml {
     $milestone = $milestones | Out-String | fzf -d $(( 2 + ($milestones.Count) )) -m
     # gh command to list issues in the milestone
     gh issue list -m "$milestone"
+
+    # Checks if user has exited without choosing a milestone
+    # Without this, the script outputs all issues if no milestone is chosen
+    if($null -eq $milestone) {
+        return
+    }
+    else {
+        gh issue list -m "$milestone"
+    }
 }
 fml
