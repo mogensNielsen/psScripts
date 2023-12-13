@@ -11,4 +11,4 @@ function git-switch-main { git switch main }
 Set-Alias -Name main -Value git-switch-main
 
 # Change this path to where Powershell scripts are stored
-$env:path += ";H:\My Documents\work\powershell"
+$env:path += ";[path to where you have stored your scripts]"
