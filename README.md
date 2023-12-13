@@ -13,6 +13,8 @@ Install fzf
 
 Install PSReadLine
 
+**Note**: This might already be installed in your Powershell, check with `Get-Module` if PSReadline is listed there. 
+
 `Install-Module -Name PSReadLine -AllowClobber -Force -Scope CurrentUser`
 
 Install PSFzf
