@@ -7,17 +7,17 @@ Might convert to a private repository at a later time.
 
 ## Installing PSFzf
 
-Install fzf
+### Install fzf
 
 `winget install junegunn.fzf`
 
-Install PSReadLine
+### Install PSReadLine
 
 **Note**: This might already be installed in your Powershell, check with `Get-Module` if PSReadline is listed there. 
 
 `Install-Module -Name PSReadLine -AllowClobber -Force -Scope CurrentUser`
 
-Install PSFzf
+### Install PSFzf
 
 `Install-Module -Name PSFzf -AllowClobber -Force -Scope CurrentUser`
 
