@@ -24,7 +24,10 @@ Might convert to a private repository at a later time.
 ## Scripts
 
 ### Fuzzy milestones (fml.ps1)
-Outputs all milestones in the current GitHub repository and lists them in terminal. User can choose a milestone, with fuzzy search or using arrow keys, and press enter. The script then lists all issues in that milestone.
+Outputs all milestones in the current GitHub repository and lists them in the terminal. User can choose a milestone, with fuzzy search or using arrow keys, and press enter. The script then lists all issues in that milestone.
 
 ### Fuzzy branches (fbr.ps1)
 Outputs all branches (local and remote) in the current GitHub repository and lists them in the terminal. User can choose a branch, with fuzzy search or using arrow keys, and press enter. The script then performs a `git switch` to the chosen branch.
+
+### Fuzzy dbt run
+Outputs all .sql files in the `models` folder and lists them in the terminal. User can choose a model, with fuzzy search or using arrow keys, and press enter. The scripts then performs a `dbt -s run [model name]` with the chosen model.
