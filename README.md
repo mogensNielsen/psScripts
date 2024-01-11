@@ -31,3 +31,5 @@ Outputs all branches (local and remote) in the current GitHub repository and lis
 
 ### Fuzzy dbt run
 Outputs all .sql files in the `models` folder and lists them in the terminal. User can choose a model, with fuzzy search or using arrow keys, and press enter. The scripts then performs a `dbt -s run [model name]` with the chosen model.
+
+Multi select is supported. Press `tab` on a model name, delete the previous search (e.g. backspace), do a new search and press `tab` on the next model to run.
