@@ -6,9 +6,7 @@ function fml {
     # expand title to get only the string value
     $milestones = gh api repos/:owner/:repo/milestones | ConvertFrom-Json | Select-Object -ExpandProperty title
     # Pipe milestones to fzf to enable fuzzy search
-    $milestone = $milestones | Out-String | fzf -d $(( 2 + ($milestones.Count) )) -m
-    # gh command to list issues in the milestone
-    gh issue list -m "$milestone"
+    $milestone = $milestones | Out-String | fzf -d $(( 2 + ($milestones.Count) ))
 
     # Checks if user has exited without choosing a milestone
     # Without this, the script outputs all issues if no milestone is chosen
