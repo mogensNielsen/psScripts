@@ -1,4 +1,4 @@
-# Fuzzy dbt run
+# Fuzzy dbt
 # Syntax: fdbt [command]
 # Lists models under \models\ and pipes them to fzf so that the user can fuzzy search for a model
 # Then performs the specified dbt command on the selected model(s)
