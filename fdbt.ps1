@@ -30,6 +30,7 @@ function fdbt {
     else {
         if($command -eq 'compile') {
             Write-Output "Doing dbt compile for $models. Sends output to the clipboard."
+            # Pipes the output to the clipboard
             & dbt compile -s $models | Set-Clipboard
         }
         else {
