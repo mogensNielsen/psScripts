@@ -5,7 +5,7 @@
 # If no dbt command or model is selected (ctrl-c), it fails gracefully
 function fdbt {
     param(
-        [ValidateSet('list', 'compile', 'run', 'build', 'test')]
+        [ValidateSet('list', 'compile', 'run', 'build', 'test', 'lint', 'fix', 'format')]
         [string]$command = $args[0]
     )
 
@@ -23,19 +23,26 @@ function fdbt {
 
     # No model(s) chosen, exit
     if(-not $models) {
-        Write-Output "No model selected"
+        Write-Output 'No model selected'
         return
     }
     # Show what will be done and do it
     else {
         if($command -eq 'compile') {
-            Write-Output "Doing dbt compile for $models. Sends output to the clipboard."
+            Write-Output 'Doing dbt compile for $models. Sends output to the clipboard.'
             # Pipes the output to the clipboard
             & dbt compile -s $models | Set-Clipboard
         }
+        elseif($command -in @('lint', 'fix', 'format')) {
+            $sqlfluff_command = 'dbt sqlfluff $command $models'
+            Write-Output 'Performing $sqlfluff_command'
+            # Adds the command to the history for easy retrieval
+            [Microsoft.Powershell.PSConsoleReadLine]::AddToHistory($dbt_command)
+            & dbt sqlfluff $command $models
+        }
         else {
-            $dbt_command = "dbt $command -s $models"
-            Write-Output "Performing $dbt_command"
+            $dbt_command = 'dbt $command -s $models'
+            Write-Output 'Performing $dbt_command'
             # Adds the command to the history for easy retrieval
             [Microsoft.Powershell.PSConsoleReadLine]::AddToHistory($dbt_command)
             & dbt $command -s $models
