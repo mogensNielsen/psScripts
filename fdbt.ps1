@@ -1,17 +1,17 @@
-# Fuzzy dbt run
+# Fuzzy dbt
 # Syntax: fdbt [command]
 # Lists models under \models\ and pipes them to fzf so that the user can fuzzy search for a model
 # Then performs the specified dbt command on the selected model(s)
 # If no dbt command or model is selected (ctrl-c), it fails gracefully
 function fdbt {
     param(
-        [ValidateSet("list", "compile", "run", "build", "test")]
+        [ValidateSet('list', 'compile', 'run', 'build', 'test')]
         [string]$command = $args[0]
     )
 
     # No command chosen, exit
     if(-not $command) {
-        Write-Output "Please specify a dbt command: list, compile, run, build or test"
+        Write-Output 'Please specify a dbt command: list, compile, run, build or test'
         return
     }
 
@@ -28,11 +28,17 @@ function fdbt {
     }
     # Show what will be done and do it
     else {
-        $dbt_command = "dbt $command -s $models"
-        Write-Output "Performing $dbt_command"
-        # Adds the command to the history for easy retrieval
-        [Microsoft.Powershell.PSConsoleReadLine]::AddToHistory($dbt_command)
-        & dbt $command -s $models
+        if($command -eq 'compile') {
+            Write-Output "Doing dbt compile for $models. Sends output to the clipboard."
+            & dbt compile -s $models | Set-Clipboard
+        }
+        else {
+            $dbt_command = "dbt $command -s $models"
+            Write-Output "Performing $dbt_command"
+            # Adds the command to the history for easy retrieval
+            [Microsoft.Powershell.PSConsoleReadLine]::AddToHistory($dbt_command)
+            & dbt $command -s $models
+        }
     }
 }
 fdbt
