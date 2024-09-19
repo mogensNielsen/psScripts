@@ -16,39 +16,45 @@ function fdbt {
     }
 
     # Gets all filenames (without extension) under \models\
-    $models = (Get-ChildItem models\ -Recurse -Include *.sql).FullName
+    $models = (Get-ChildItem models\ -Recurse -Include *.sql)
     # Pipes the list of models to fzf for fuzzy searching
     # The -m enables mulitple selections by tapping the tab key on the selected items
-    $models_chosen = $models | Out-String | fzf -d $(( 2 + ($models.Count) )) -m
+    $models = $models | Out-String | fzf -d $(( 2 + ($models.Count) )) -m
 
-    Write-Output $models_chosen
+    Write-Output $models
+    foreach ($model in $models) {
+        $baseName = $model.BaseName
+        $fullName = $model.FullName
+
+        Write-Output "$model : BaseName: $baseName and FullName: $fullName"
+    }
     break
 
     # No model(s) chosen, exit
-    if(-not $models_chosen) {
+    if(-not $models) {
         Write-Output "No model selected"
         return
     }
     # Show what will be done and do it
     else {
         if($command -eq 'compile') {
-            Write-Output "Doing dbt compile for $models_chosen. Sends output to the clipboard."
+            Write-Output "Doing dbt compile for $models. Sends output to the clipboard."
             # Pipes the output to the clipboard
-            & dbt compile -s $models_chosen | Set-Clipboard
+            & dbt compile -s $models | Set-Clipboard
         }
         elseif($command -in @('lint', 'fix', 'format')) {
             $sqlfluff_command = "dbt sqlfluff $command $models"
             Write-Output "Performing $sqlfluff_command"
             # Adds the command to the history for easy retrieval
             [Microsoft.Powershell.PSConsoleReadLine]::AddToHistory($dbt_command)
-            & dbt sqlfluff $command $models
+            #& dbt sqlfluff $command $models
         }
         else {
-            $dbt_command = "dbt $command -s $models_chosen"
+            $dbt_command = "dbt $command -s $models"
             Write-Output "Performing $dbt_command"
             # Adds the command to the history for easy retrieval
             [Microsoft.Powershell.PSConsoleReadLine]::AddToHistory($dbt_command)
-            & dbt $command -s $models_chosen
+            & dbt $command -s $models
         }
     }
 }
