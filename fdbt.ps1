@@ -31,7 +31,9 @@ function fdbt {
         if($command -eq 'compile') {
             Write-Output "Doing dbt compile for $models. Sends output to the clipboard."
             # Pipes the output to the clipboard
-            & dbt compile -s $models | Set-Clipboard
+            $compiled_sql = & dbt compile -s $models
+            $compiled_sql = $compiled_sql -replace "^.*?Compiled node .* is:", "" -replace "Downloading artifacts", "" -replace "Invocation has finished", ""
+            $compiled_sql | Set-Clipboard
         }
         else {
             $dbt_command = "dbt $command -s $models"
