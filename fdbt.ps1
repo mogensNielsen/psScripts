@@ -5,12 +5,13 @@
 # If no dbt command or model is selected (ctrl-c), it fails gracefully
 function fdbt {
     param(
-        [ValidateSet('list', 'compile', 'run', 'build', 'test')]
         [string]$command = $args[0]
     )
 
+    $allowed_commands = @('list', 'compile', 'run', 'build', 'test', 'lint')
+
     # No command chosen, exit
-    if(-not $command) {
+    if(-not $command -or $command -notin $allowed_commands) {
         Write-Output 'Please specify a dbt command: list, compile, run, build or test'
         return
     }
@@ -41,6 +42,12 @@ function fdbt {
 
             $compiled_sql = $compiled_sql -replace "^.*?Compiled node .* is:", "" -replace "Downloading artifacts", "" -replace "Invocation has finished", ""
             $compiled_sql | Set-Clipboard
+        }
+        elseif ($command -eq 'lint') {
+            # Print the contents of $command
+            Write-Output "DEBUG: dbt $command $models"
+            # The problem now is that $models only contains the name of the model,
+            # not the full path
         }
         else {
             $dbt_command = "dbt $command -s $models"
