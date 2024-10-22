@@ -32,6 +32,13 @@ function fdbt {
             Write-Output "Doing dbt compile for $models. Sends output to the clipboard."
             # Pipes the output to the clipboard
             $compiled_sql = & dbt compile -s $models
+
+            # Splits the output into an array of lines (splits on newline)
+            $compiled_sql_lines = $compiled_sql.Split("`n")
+            # Removes the first 11 lines (they are just dbt logs) and then joins the rest into a single string
+            # Joins with newline
+            $compiled_sql = $compiled_sql_lines[11..$compiled_sql_lines.Length] -join "`n"
+
             $compiled_sql = $compiled_sql -replace "^.*?Compiled node .* is:", "" -replace "Downloading artifacts", "" -replace "Invocation has finished", ""
             $compiled_sql | Set-Clipboard
         }
