@@ -12,14 +12,20 @@ function fdbt {
 
     # No command chosen, exit
     if(-not $command -or $command -notin $allowed_commands) {
-        Write-Output 'Please specify a dbt command: list, compile, run, build or test'
+        Write-Output 'Please specify a dbt command: list, compile, run, build, test, or lint'
         return
     }
 
-    # Gets all filenames (without extension) under \models\
-    $models = (Get-ChildItem models\ -Recurse -Include *.sql).BaseName
+    # Gets either the basenames or full paths, depending on the command
+    if ($command -eq 'lint') {
+        # Get full paths with forward slashes
+        $models = (Get-ChildItem models\ -Recurse -Include *.sql | ForEach-Object { $_.FullName -replace '\\', '/' })
+    } else {
+        # Get basenames for other commands
+        $models = (Get-ChildItem models\ -Recurse -Include *.sql).BaseName
+    }
+
     # Pipes the list of models to fzf for fuzzy searching
-    # The -m enables mulitple selections by tapping the tab key on the selected items
     $models = $models | Out-String | fzf -d $(( 2 + ($models.Count) )) -m
 
     # No model(s) chosen, exit
@@ -31,28 +37,19 @@ function fdbt {
     else {
         if($command -eq 'compile') {
             Write-Output "Doing dbt compile for $models. Sends output to the clipboard."
-            # Pipes the output to the clipboard
             $compiled_sql = & dbt compile -s $models
-
-            # Splits the output into an array of lines (splits on newline)
             $compiled_sql_lines = $compiled_sql.Split("`n")
-            # Removes the first 11 lines (they are just dbt logs) and then joins the rest into a single string
-            # Joins with newline
             $compiled_sql = $compiled_sql_lines[11..$compiled_sql_lines.Length] -join "`n"
-
             $compiled_sql = $compiled_sql -replace "^.*?Compiled node .* is:", "" -replace "Downloading artifacts", "" -replace "Invocation has finished", ""
             $compiled_sql | Set-Clipboard
         }
         elseif ($command -eq 'lint') {
-            # Print the contents of $command
-            Write-Output "DEBUG: dbt $command $models"
-            # The problem now is that $models only contains the name of the model,
-            # not the full path
+            Write-Output "Performing dbt sqlfluff lint for $models"
+            & dbt sqlfluff lint -s "$models"
         }
         else {
             $dbt_command = "dbt $command -s $models"
             Write-Output "Performing $dbt_command"
-            # Adds the command to the history for easy retrieval
             [Microsoft.Powershell.PSConsoleReadLine]::AddToHistory($dbt_command)
             & dbt $command -s $models
         }
